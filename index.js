@@ -3,7 +3,7 @@ const app = express()
 const port = process.env.PORT || 3000;
 app.use(express.json())
 app.get('/', (req, res) => {
- res.send('Hai saya syamim hensem')
+ res.send('Hazim idola Syamim')
 })
 app.listen(port, () => {
  console.log(`Example app listening on port ${port}`)
