@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 const port = process.env.PORT || 3000;
+const bcryptjs = require('bcryptjs')
 
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
@@ -33,30 +34,68 @@ run().catch(console.dir);
 
 app.use(express.json())
 
+app.get('/', (req, res) => {
+  {
+    client.db("NanoNini").collection("users").insertOne({
+      "username": req.body.username,
+      "password": req.body.password,
+    })
+  };
+  res.send('Hello World!')
+})
+
 app.post('/register', (req, res) => {
+  const {username,password}=req.body
+  console.log(username,password);
 
-    client.db("NanoNini").collection("users").insertOne(
+  const hash= bcryptjs.hashSync(password,10);
+  client.db("NanoNini").collection("users").
+  insertOne({"username": req.body.username,"password": hash });
+  res.send('Register successfully');
+  console.log(hash);
+})
+  
+
+  //client.db("NanoNini").collection("users").find({
+    //"username": { $eq: req.body.username }
+  //}).toArray().then((result) => {
+    //if (result.length > 0) {
+      //res.status(400).send('Username already exists')
+    //} else {
+      //client.db("NanoNini").collection("users").insertOne({
+        //"username": req.body.username,
+        //"password": req.body.password,
+      //})
+      //res.send('Register successfully')
+    //}
+ // })
+//})
+
+app.patch('/profile', (req, res) => {
+  client.db("NanoNini").collection("users").updateOne({
+    "username": { $eq: req.body.username }}, 
     {
-       "username": req.body.username,
-       "password": req.body.password,
-    }
-);
+    $set: {
+      "email": req.body.email
+     },
 
- res.send('Hello World')
+  }).then(result => {
+    res.send('Update successfully')
+  })
 })
 
 app.post('/login', (req, res) => {
-    if (req.body.username !== 'Apip') {
-        res.status(400).send('Invalid username')
-        return
-    }
-    if (req.body.password !== 'Apip123') {
-        res.status(401).send('Invalid password')
-        return
-    }
-    res.send('login successfully')
+  if (req.body.username !== 'Apip') {
+    res.status(400).send('Invalid username')
+    return
+  }
+  if (req.body.password !== 'Apip123') {
+    res.status(401).send('Invalid password')
+    return
+  }
+  res.send('login successfully')
 })
 
 app.listen(port, () => {
- console.log(`Example app listening on port ${port}`)
+console.log(`Example app listening on port ${port}`)
 })
